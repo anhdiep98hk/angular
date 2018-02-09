@@ -1,0 +1,85 @@
+<h1>Angular CRUD Operation</h1>
+<h3 *ngIf="articleIdToUpdate; else create">
+  <!--Nếu có id để update thì hiển thị. Không thì hiển thị Create new Article-->
+  Update Article for Id: {{articleIdToUpdate}}
+</h3>
+
+<ng-template #create>
+  <h3>Create new Article</h3>
+</ng-template>
+
+<div>
+  <form [formGroup]="articleForm" (ngSubmit)="onArticleFormSubmit()">
+    <table>
+      <tr>
+        <td>Enter Title</td>
+        <td>
+          <input formControlName="title">
+          <label *ngIf="articleForm.get('title').invalid && processValidation" [ngClass]="'error'">Title is required</label>
+        </td>
+      </tr>
+      <tr>
+        <td>Enter Category</td>
+        <td>
+          <input formControlName="category">
+          <label *ngIf="articleForm.get('category').invalid && processValidation" [ngClass]="'error'">Category is required</label>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <button *ngIf="!articleIdToUpdate">Create</button>
+          <button *ngIf="articleIdToUpdate">Update</button>
+          <button (click)="backToCreateArticle()" *ngIf="articleIdToUpdate">Go Back</button>
+        </td>
+      </tr>
+    </table>
+  </form>
+  <br/>
+  <div *ngIf="statusCode; else processing">
+    <div *ngIf="statusCode === 201" [ngClass]="'success'">
+      <!--Nếu tình trạng bằng 201 thông báo thêm thành công-->
+      Article added successfully
+    </div>
+    <div *ngIf="statusCode === 409" [ngClass]="'error'">
+      <!--Nếu tình trạng bằng 409 thông báo đã tồn tại-->
+      Article already exists
+    </div>
+    <div *ngIf="statusCode === 200" [ngClass]="'success'">
+      <!--Nếu tình trạng bằng 200 thông báo update thành công-->
+      Article updated successfully
+    </div>
+    <div *ngIf="statusCode === 204" [ngClass]="'success'">
+      <!--Nếu tình trạng bằng 204 thông báo xóa thành công-->
+      Article deleted successfully
+    </div>
+    <div *ngIf="statusCode === 500" [ngClass]="'error'">
+      <!--Nếu tình trạng bằng 500 thông báo lỗi máy chủ-->
+      Internal Server Error
+    </div>
+  </div>
+  <ng-template #processing>
+    <img *ngIf="requestProcessing" src="assets/images/loading.gif" width="10%" height="10%">
+  </ng-template>
+</div>
+
+<h3>Article Details</h3>
+<table>
+  <tr>
+    <th>Id</th>
+    <th>Title</th>
+    <th>Category</th>
+    <th></th>
+    <th></th>
+  </tr>
+  <tr *ngFor="let article of allArticles">
+    <td>{{article.articleId}}</td>
+    <td>{{article.title}}</td>
+    <td>{{article.category}}</td>
+    <td>
+      <button type="button" (click)="loadArticleToEdit(article.articleId)">Edit</button>
+    </td>
+    <td>
+      <button type="button" (click)="deleteArticle(article.articleId)">Delete</button>
+    </td>
+  </tr>
+</table>
